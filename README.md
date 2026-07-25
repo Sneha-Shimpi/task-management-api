@@ -20,21 +20,6 @@ https://github.com/Sneha-Shimpi/task-management-api
 
 ---
 
-## 📸 Application Preview
-
-### 🏠 Dashboard
-![Dashboard](home.png)
-
-### ➕ Create Task
-![Create Task](create-task.png)
-
-### ✏️ Edit Task
-![Edit Task](edit-task.png)
-
-### 🔍 Filter Tasks
-![Filter Tasks](filter-task.png)
----
-
 ## ✨ Features
 
 - Create new tasks
