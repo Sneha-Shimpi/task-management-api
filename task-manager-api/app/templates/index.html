@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow API – A Modern Task Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <header class="board__header">
+    <div class="header__content">
+      <div class="header__eyebrow">
+        <span class="header__title-label">Task Log</span>
+        <span class="header__badge">● Live workspace</span>
+        <span class="header__pill">SaaS dashboard</span>
+      </div>
+      <h1>TaskFlow Dashboard</h1>
+      <p class="header__subtitle">Stay organized, prioritize with confidence, and move every important task forward with clarity.</p>
+    </div>
+    <div class="header__actions">
+      <button class="btn btn--ghost" id="refreshBtn" type="button">↻ Refresh</button>
+      <button class="btn btn--primary" id="newTaskBtn" type="button">＋ New Task</button>
+    </div>
+  </header>
+
+  <section class="hero-panel">
+    <div class="hero-panel__copy">
+      <p class="hero-panel__label">Operations overview</p>
+      <h2>Keep priorities visible, timelines calm, and execution effortless.</h2>
+    </div>
+    <div class="hero-panel__chips">
+      <span class="hero-chip">⚡ Fast updates</span>
+      <span class="hero-chip">🎯 Clear focus</span>
+      <span class="hero-chip">📈 Better flow</span>
+    </div>
+  </section>
+
+  <section class="stats-grid" id="statsGrid">
+    <article class="stat-card stat-card--blue">
+      <div class="stat-card__icon">☰</div>
+      <div>
+        <span class="stat-card__label">Total tasks</span>
+        <strong class="stat-card__value" id="stat-total">0</strong>
+      </div>
+    </article>
+    <article class="stat-card stat-card--green">
+      <div class="stat-card__icon">✓</div>
+      <div>
+        <span class="stat-card__label">Completed</span>
+        <strong class="stat-card__value" id="stat-done">0</strong>
+      </div>
+    </article>
+    <article class="stat-card stat-card--amber">
+      <div class="stat-card__icon">⏱</div>
+      <div>
+        <span class="stat-card__label">In progress</span>
+        <strong class="stat-card__value" id="stat-progress">0</strong>
+      </div>
+    </article>
+    <article class="stat-card stat-card--slate">
+      <div class="stat-card__icon">●</div>
+      <div>
+        <span class="stat-card__label">Pending</span>
+        <strong class="stat-card__value" id="stat-todo">0</strong>
+      </div>
+    </article>
+    <article class="stat-card stat-card--red">
+      <div class="stat-card__icon">⚑</div>
+      <div>
+        <span class="stat-card__label">High priority</span>
+        <strong class="stat-card__value" id="stat-high">0</strong>
+      </div>
+    </article>
+    <article class="stat-card stat-card--violet">
+      <div class="stat-card__icon">%</div>
+      <div>
+        <span class="stat-card__label">Completion rate</span>
+        <strong class="stat-card__value" id="stat-complete">0%</strong>
+      </div>
+    </article>
+  </section>
+
+  <section class="dashboard-panel">
+    <div class="dashboard-panel__header">
+      <div>
+        <h3>Workspace controls</h3>
+        <p class="dashboard-panel__subtext">Search, filter, and focus on what matters most.</p>
+      </div>
+      <div class="toolbar__status" id="toolbarStatus" aria-live="polite"></div>
+    </div>
+    <div class="dashboard-panel__controls">
+      <label class="search-field">
+        <span class="sr-only">Search tasks</span>
+        <input type="search" id="searchInput" placeholder="🔎 Search tasks" />
+      </label>
+      <div class="filter-group" data-filter="priority">
+        <span class="filter-label">Priority</span>
+        <button class="chip" data-value="">All</button>
+        <button class="chip chip--low" data-value="low">Low</button>
+        <button class="chip chip--medium" data-value="medium">Medium</button>
+        <button class="chip chip--high" data-value="high">High</button>
+      </div>
+      <label class="select-field">
+        <span class="filter-label">Status</span>
+        <select id="statusFilter">
+          <option value="">All statuses</option>
+          <option value="todo">Todo</option>
+          <option value="in_progress">In progress</option>
+          <option value="done">Done</option>
+        </select>
+      </label>
+      <label class="select-field">
+        <span class="filter-label">Due date</span>
+        <input type="date" id="dueDateFilter" />
+      </label>
+      <label class="select-field">
+        <span class="filter-label">Sort</span>
+        <select id="sortSelect">
+          <option value="created_at_desc">Newest</option>
+          <option value="created_at_asc">Oldest</option>
+          <option value="priority_desc">Priority</option>
+          <option value="title_asc">Alphabetical</option>
+        </select>
+      </label>
+    </div>
+  </section>
+
+  <div class="columns" id="columns">
+    <section class="column" data-status="todo">
+      <div class="column__head">
+        <span class="column__label">Pending</span>
+        <span class="column__count" id="count-todo">0</span>
+      </div>
+      <div class="column__body" id="list-todo"></div>
+    </section>
+
+    <section class="column" data-status="in_progress">
+      <div class="column__head">
+        <span class="column__label">In progress</span>
+        <span class="column__count" id="count-in_progress">0</span>
+      </div>
+      <div class="column__body" id="list-in_progress"></div>
+    </section>
+
+    <section class="column" data-status="done">
+      <div class="column__head">
+        <span class="column__label">Completed</span>
+        <span class="column__count" id="count-done">0</span>
+      </div>
+      <div class="column__body" id="list-done"></div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal__head">
+      <h2 id="modalTitle">New task</h2>
+      <button class="modal__close" id="modalClose" aria-label="Close">×</button>
+    </div>
+    <form id="taskForm">
+      <input type="hidden" id="taskId">
+
+      <label class="field">
+        <span class="field__label">Task title</span>
+        <input type="text" id="fieldTitle" maxlength="200" required autocomplete="off" placeholder="What needs attention?"></label>
+
+      <label class="field">
+        <span class="field__label">Description</span>
+        <textarea id="fieldDescription" rows="3" maxlength="5000" placeholder="Add context or notes"></textarea>
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span class="field__label">Status</span>
+          <select id="fieldStatus">
+            <option value="todo">Todo</option>
+            <option value="in_progress">In progress</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field__label">Priority</span>
+          <select id="fieldPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field__label">Due date</span>
+        <input type="date" id="fieldDueDate">
+      </label>
+
+      <p class="form__error" id="formError" hidden></p>
+
+      <div class="modal__actions">
+        <button type="button" class="btn btn--danger" id="deleteBtn" hidden>🗑 Delete</button>
+        <div class="modal__actions-right">
+          <button type="button" class="btn btn--ghost" id="cancelBtn">✕ Cancel</button>
+          <button type="submit" class="btn btn--primary">💾 Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
